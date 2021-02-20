@@ -20,19 +20,19 @@ vtable:
 .size vtable, .-vtable
 
 // Reset handler, called upon reset
-.type reset_handler, %function
-reset_handler:
+//.type reset_handler, %function
+// reset_handler:
   // Set the stack pointer to the end of the stack.
   // The '_estack' value is defined in our linker script.
-  LDR  r0, = _estack
-  MOV  sp, r0
+//  LDR  r0, = _estack
+  //MOV  sp, r0
 
   // Set some dummy values to load on the chip
-  LDR  r7, = 0xDEADBEEF
-  MOVS r0, #0
-  main_loop:
+  //LDR  r7, = 0x00000000
+  //MOVS r0, #0
+  //main_loop:
     // Add 1 to register 'r0'.
-    ADDS r0, r0, #1
+    //ADDS r0, r0, #1
     // Loop back.
-    B    main_loop
-.size reset_handler, .-reset_handler
+    //B    main_loop
+//.size reset_handler, .-reset_handler
