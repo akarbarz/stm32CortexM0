@@ -28,17 +28,17 @@ GPIOB->PUPDR &= ~GPIO_PUPDR_PUPDR6;
 GPIOB->PUPDR &= ~GPIO_PUPDR_PUPDR7;
 // Set alt function for pin 6 and 7
 // 0b00010001000000000000000000000000
-GPIOB->AFR[0] = (1 << 24) | (1 << 28);//0b00010001000000000000000000000000; //(1 << 24) | (1 << 28);
+GPIOB->AFR[0] = 0b00010001000000000000000000000000;// this is cleaner way i think (1 << 24) | (1 << 28);
 
 // Enable I2C
 RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
 // timing configuration: used tool at https://www.st.com/en/embedded-software/stsw-stm32126.html#get-software
-I2C1->TIMINGR = (uint32_t) 0x0010020A; //0x00201D2B
+ I2C1->TIMINGR = (uint32_t) 0x00201D2B;//0x0010020A;//<- this one i think 100 kHz;0; //;/;/ <- 400khz fast mode0//
 // enable per control
 I2C1->CR1 |= I2C_CR1_PE;
 
 // Asset slave ID, room for RW
-I2C1->CR2 |= (0x60 << 1); //(0x60 << 1)
+I2C1->CR2 |= (0x60 << 1); //(0x60 << 1) 0b1100000
 // Set R/W bit 0 = W 1= R
 I2C1->CR2 &= ~I2C_CR2_RD_WRN;
 // How many bytes we are wrintg
@@ -49,10 +49,48 @@ I2C1->CR2 |= I2C_CR2_START;
 while(I2C1->CR2 & I2C_CR2_START);
 
 // write a byte to the Transmit Data register
- //I2C1->TXDR = 0b11000000; //0x60;
- I2C1->TXDR = 0x40; //0b10000000; //
- I2C1->TXDR = 0xFF; //0b00000000; //
- I2C1->TXDR = 0xF0; // 0b11110000; //
+
+ // I2C1->TXDR = 0x60; //0x60;//0b01000000;//0xC0; //0b11000010
+ //  while(!(I2C1->ISR & I2C_ISR_TXE));
+ I2C1->TXDR = 0x40;// 0xC0;
+ while(!(I2C1->ISR & I2C_ISR_TXE));
+ I2C1->TXDR = 0xFF; //0b00000000; //0xFF
+ while(!(I2C1->ISR & I2C_ISR_TXE));
+ I2C1->TXDR = 0xF0; // 0b11110000; //.
+
+
+
+
+
+
+
+
+ // I2C1->TXDR = 0x40;// 0xC0;
+ // WaitForAMoment(300);
+ // I2C1->TXDR = 0x00; //0b00000000; //0xFF
+ // WaitForAMoment(300);
+ // I2C1->TXDR = 0x00; // 0b11110000; //
+ //
+ // WaitForAMoment(70000);
+ // I2C1->TXDR = 0x40;// 0xC0;
+ // WaitForAMoment(300);
+ // I2C1->TXDR = 0xFF; //0b00000000; //0xFF
+ // WaitForAMoment(300);
+ // I2C1->TXDR = 0xF0; // 0b11110000; //
+
+
+  //I2C1->TXDR = 0xC0;// 0xC0;
+  //WaitForAMoment(300);
+  // I2C1->TXDR = 0x60; //0x60;//0b01000000;//0xC0; //0b11000010
+  // WaitForAMoment(300);
+  // I2C1->TXDR = 0xC0;// 0xC0;
+  // WaitForAMoment(300);
+  // I2C1->TXDR = 0x00; //0b00000000; //0xFF
+  // WaitForAMoment(300);
+  // I2C1->TXDR = 0x00; // 0b11110000; //
+
+ // STOPS
+
 
 // Confirm transmit by making sure TXDR is empty
  while(!(I2C1->ISR & I2C_ISR_TXE));
